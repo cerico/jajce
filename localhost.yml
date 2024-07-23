@@ -1,0 +1,27 @@
+---
+- name: Check if ansible.cfg in curdir
+  stat:
+    path: "{{ curdir }}/ansible.cfg"
+  register: ansiblecfg
+
+- name: Set dest variable to dist if not run from new apps repo
+  set_fact:
+    dest: "{{ curdir }}/dist"
+  when: ansiblecfg.stat.exists
+
+- name: Set dest variable to repos github workflows dir
+  set_fact:
+    dest: "{{ curdir }}/.github/workflows"
+  when: not ansiblecfg.stat.exists
+
+- name: Create target directory
+  file:
+    path: "{{ dest }}"
+    state: directory
+    mode: "0755"
+
+- name: Create deploy workflow yml
+  template:
+    src: dokku.yml.j2
+    dest: "{{ dest }}/dokku.yml"
+  when: "'localhost' in inventory_hostname"

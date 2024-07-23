@@ -1,0 +1,14 @@
+- hosts: dokku, localhost
+  gather_facts: false
+  vars_prompt:
+    - name: app_name
+      prompt: What should we call your new project?
+      private: false
+  tasks:
+    - name: Create workflows on localhost
+      import_tasks: localhost.yml
+      when: "'localhost' in inventory_hostname"
+
+    - name: Install packages for pi
+      import_tasks: dokku.yml
+      when: "'dokku' in inventory_hostname"

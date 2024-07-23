@@ -1,0 +1,28 @@
+---
+- name: Ensure the Dokku app exists
+  command: dokku apps:create {{ app_name }}
+  args:
+    creates: /home/dokku/{{ app_name }}
+  ignore_errors: yes
+
+- name: Ensure the Postgres service exists
+  command: dokku postgres:create {{ app_name }}db
+  args:
+    creates: /var/lib/dokku/services/postgres/{{ app_name }}db
+  ignore_errors: yes
+
+- name: Link the Postgres service to the app
+  command: dokku postgres:link {{ app_name }}db {{ app_name }}
+  ignore_errors: yes
+
+- name: Set the app domain
+  command: dokku domains:set {{ app_name }} {{ app_name }}.{{ domain }}
+
+- name: Set Let's Encrypt email
+  command: dokku letsencrypt:set {{ app_name }} email {{ email }}
+
+- name: Enable Let's Encrypt
+  command: dokku letsencrypt:enable {{ app_name }}
+
+- name: Enable Let's Encrypt auto-renew
+  command: dokku letsencrypt:auto-renew
