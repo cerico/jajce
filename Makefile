@@ -13,4 +13,6 @@ ansible:
 	source ${PYTHON_ENVIRONMENT}/bin/activate && python3 -m pip install ansible
 	$(ANSIBLE_GALAXY) collection install -r requirements.yml
 create:
-	 $(ANSIBLE_PLAYBOOK) main.yml -i hosts.ini -e curdir=$(CURDIR)
+	$(ANSIBLE_PLAYBOOK) main.yml -i hosts.ini -e curdir=$(CURDIR)
+shell:
+	$(ANSIBLE_PLAYBOOK) shell.yml -i hosts.ini -e curdir=$(CURDIR)

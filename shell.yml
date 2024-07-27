@@ -1,0 +1,43 @@
+- name: Add alias to shell
+  hosts: localhost
+  tasks:
+    - name: Check for .bashrc
+      stat:
+        path: "{{ ansible_env.HOME }}/.bashrc"
+      register: bashrc_check
+
+    - name: Check for .zshrc
+      stat:
+        path: "{{ ansible_env.HOME }}/.zshrc"
+      register: zshrc_check
+
+    - name: Set shell config file
+      set_fact:
+        shell_config_file: >-
+          {%- if bashrc_check.stat.exists -%}
+          {{ ansible_env.HOME }}/.bashrc
+          {%- elif zshrc_check.stat.exists -%}
+          {{ ansible_env.HOME }}/.zshrc
+          {%- else -%}
+          none
+          {%- endif -%}
+
+    - name: Fail if neither .bashrc nor .zshrc exists
+      fail:
+        msg: "Neither .bashrc nor .zshrc exists. Aborting."
+      when: shell_config_file == "none"
+
+    - name: Get current directory
+      set_fact:
+        current_dir: "{{ lookup('pipe', 'pwd') }}"
+
+    - name: Add volz function to shell config file
+      lineinfile:
+        path: "{{ shell_config_file }}"
+        line: |
+          dokku () {
+            local loc={{ current_dir }}
+            make -f $loc/Makefile create -C $loc CURDIR=$(pwd)
+          }
+        create: yes
+        state: present
