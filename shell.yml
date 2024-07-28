@@ -1,30 +1,28 @@
 - name: Add alias to shell
   hosts: localhost
   tasks:
-    - name: Check for .bashrc
+    - name: Check for potential shell config file locations to put function
       stat:
-        path: "{{ ansible_env.HOME }}/.bashrc"
-      register: bashrc_check
-
-    - name: Check for .zshrc
-      stat:
-        path: "{{ ansible_env.HOME }}/.zshrc"
-      register: zshrc_check
+        path: "{{ ansible_env.HOME }}/{{ item }}"
+      register: shell_config_files
+      loop:
+        - .zsh/jajce.zsh
+        - .zshrc
+        - .bashrc
 
     - name: Set shell config file
       set_fact:
-        shell_config_file: >-
-          {%- if bashrc_check.stat.exists -%}
-          {{ ansible_env.HOME }}/.bashrc
-          {%- elif zshrc_check.stat.exists -%}
-          {{ ansible_env.HOME }}/.zshrc
-          {%- else -%}
-          none
-          {%- endif -%}
+        shell_config_file: "none"
 
-    - name: Fail if neither .bashrc nor .zshrc exists
+    - name: Determine shell config file
+      set_fact:
+        shell_config_file: "{{ item.stat.path }}"
+      when: item.stat.exists and shell_config_file == "none"
+      loop: "{{ shell_config_files.results }}"
+
+    - name: Fail if no shell config file exists
       fail:
-        msg: "Neither .bashrc nor .zshrc exists. Aborting."
+        msg: "None of jajce.zsh, .zshrc, or .bashrc exists. Aborting."
       when: shell_config_file == "none"
 
     - name: Get current directory
