@@ -1,6 +1,6 @@
 {
   "name": "jajce",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "### Provision Dokku aoplications via Ansible",
   "main": "index.js",
   "scripts": {

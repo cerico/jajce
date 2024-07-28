@@ -1,3 +1,12 @@
+## [0.2.1](https://github.com/cerico/jajce/compare/v0.2.0...v0.2.1) (2024-07-28)
+
+
+### Bug Fixes
+
+* improve addtoshell playbook ([3958a14](https://github.com/cerico/jajce/commit/3958a14c943cd9b787f9eba6b79b9cd65d95a42c))
+
+
+
 # [0.2.0](https://github.com/cerico/jajce/compare/v0.1.0...v0.2.0) (2024-07-27)
 
 
